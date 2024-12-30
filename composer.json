@@ -1,0 +1,53 @@
+{
+    "name": "jobmetric/authio",
+    "description": "It is a simple and secure package for user authentication and login management in Laravel. This package easily implements the registration, login, password recovery, and two-factor authentication processes.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "jobmetric",
+        "package",
+        "user",
+        "auth",
+        "authentication",
+        "login",
+        "register",
+        "password",
+        "recovery",
+        "two-factor",
+        "2fa"
+    ],
+    "homepage": "https://doc.jobmetric.net/package/authio",
+    "authors": [
+        {
+            "name": "Majid Mohammadian",
+            "email": "majeedmohammadian@gmail.com",
+            "homepage": "https://www.linkedin.com/in/majidmohammadian/",
+            "role": "Full Stack Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0.1",
+        "laravel/framework": ">=9.19",
+        "jobmetric/laravel-package-core": "^1.18.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "JobMetric\\Authio\\": "src/",
+            "JobMetric\\Authio\\Factories\\": "database/factories/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "JobMetric\\Authio\\AuthioServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "support": {
+        "issues": "https://github.com/jobmetric/authio/issues",
+        "forum": "https://twitter.com/jobmetric",
+        "source": "https://github.com/jobmetric/authio"
+    }
+}
