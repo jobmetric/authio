@@ -4,6 +4,7 @@ namespace JobMetric\Authio\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use JobMetric\Authio\Enums\LoginTypeEnum;
 
 class AuthRequestRequest extends FormRequest
 {
@@ -23,12 +24,12 @@ class AuthRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'string|in:mobile,email',
+            'type' => 'string|in:' . implode(',', LoginTypeEnum::values()),
 
-            'mobile_prefix' => 'required_if:type,==,mobile',
-            'mobile' => 'required_if:type,==,mobile',
+            'mobile_prefix' => 'required_if:type,==,' . LoginTypeEnum::MOBILE(),
+            'mobile' => 'required_if:type,==,' . LoginTypeEnum::MOBILE(),
 
-            'email' => 'required_if:type,==,email',
+            'email' => 'required_if:type,==,' . LoginTypeEnum::EMAIL(),
         ];
     }
 }
