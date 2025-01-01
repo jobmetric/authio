@@ -2,7 +2,6 @@
 
 namespace JobMetric\Authio\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,7 +17,11 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasBlock;
+    use HasApiTokens,
+        HasFactory,
+        Notifiable,
+        SoftDeletes,
+        HasBlock;
 
     /**
      * The attributes that are mass assignable.
@@ -27,12 +30,13 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'email',
+        'email_verified_at',
         'mobile_prefix',
         'mobile',
         'mobile_verified_at',
-        'email',
-        'email_verified_at',
         'password',
+        'remember_token',
     ];
 
     /**
@@ -67,13 +71,13 @@ class User extends Authenticatable
      */
     public function scopeOfName(Builder $query, string $name, bool $withTrashed = false): Builder
     {
-        $q = $query->where('name', $name);
+        $query->where('name', $name);
 
-        if($withTrashed) {
-            $q->withTrashed();
+        if ($withTrashed) {
+            $query->withTrashed();
         }
 
-        return $q;
+        return $query;
     }
 
     /**
@@ -88,16 +92,16 @@ class User extends Authenticatable
      */
     public function scopeOfMobile(Builder $query, string $mobile_prefix, string $mobile, bool $withTrashed = false): Builder
     {
-        $q = $query->where([
+        $query->where([
             'mobile_prefix' => $mobile_prefix,
             'mobile' => $mobile,
         ]);
 
-        if($withTrashed) {
-            $q->withTrashed();
+        if ($withTrashed) {
+            $query->withTrashed();
         }
 
-        return $q;
+        return $query;
     }
 
     /**
@@ -111,13 +115,13 @@ class User extends Authenticatable
      */
     public function scopeOfEmail(Builder $query, string $email, bool $withTrashed = false): Builder
     {
-        $q = $query->where('email', $email);
+        $query->where('email', $email);
 
-        if($withTrashed) {
-            $q->withTrashed('deleted_at');
+        if ($withTrashed) {
+            $query->withTrashed('deleted_at');
         }
 
-        return $q;
+        return $query;
     }
 
     /**
