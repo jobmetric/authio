@@ -2,15 +2,17 @@
 
 namespace JobMetric\Authio\Factories;
 
-use App\Enums\LoginTypeEnum;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use JobMetric\Authio\Enums\LoginTypeEnum;
+use JobMetric\Authio\Models\UserOtp;
 
 /**
- * @extends Factory<User>
+ * @extends Factory<UserOtp>
  */
 class UserOtpFactory extends Factory
 {
+    protected $model = UserOtp::class;
+
     /**
      * Define the model's default state.
      *
@@ -25,7 +27,6 @@ class UserOtpFactory extends Factory
             'otp' => fake()->numberBetween(10000, 99999),
             'try_count' => 0,
             'used_at' => null,
-            'ip_address' => fake()->ipv4(),
         ];
     }
 
@@ -43,6 +44,72 @@ class UserOtpFactory extends Factory
     }
 
     /**
+     * Indicate that the model's source is mobile.
+     *
+     * @return static
+     */
+    public function sourceMobile(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'source' => LoginTypeEnum::MOBILE
+        ]);
+    }
+
+    /**
+     * Indicate that the model's source is email.
+     *
+     * @return static
+     */
+    public function sourceEmail(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'source' => LoginTypeEnum::EMAIL
+        ]);
+    }
+
+    /**
+     * Indicate that the model's secret.
+     *
+     * @param string $secret
+     *
+     * @return static
+     */
+    public function secret(string $secret): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'secret' => $secret
+        ]);
+    }
+
+    /**
+     * Indicate that the model's otp.
+     *
+     * @param string $otp
+     *
+     * @return static
+     */
+    public function otp(string $otp): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'otp' => $otp
+        ]);
+    }
+
+    /**
+     * Indicate that the model's try count.
+     *
+     * @param int $try_count
+     *
+     * @return static
+     */
+    public function tryCount(int $try_count): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'try_count' => $try_count
+        ]);
+    }
+
+    /**
      * Indicate that the model's otp should be used.
      *
      * @return static
@@ -51,16 +118,6 @@ class UserOtpFactory extends Factory
     {
         return $this->state(fn(array $attributes) => [
             'used_at' => now()
-        ]);
-    }
-
-    /**
-     * Indicate that the model's real ip address.
-     */
-    public function realIpAddress(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'ip_address' => request()->ip()
         ]);
     }
 }
