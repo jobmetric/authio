@@ -25,6 +25,7 @@ class UserOtpFactory extends Factory
             'source' => fake()->randomElement(LoginTypeEnum::values()),
             'secret' => fake()->text(30),
             'otp' => fake()->numberBetween(10000, 99999),
+            'ip_address' => fake()->ipv4(),
             'try_count' => 0,
             'used_at' => null,
         ];
@@ -92,6 +93,20 @@ class UserOtpFactory extends Factory
     {
         return $this->state(fn(array $attributes) => [
             'otp' => $otp
+        ]);
+    }
+
+    /**
+     * Indicate that the model's ip address.
+     *
+     * @param string $ip_address
+     *
+     * @return static
+     */
+    public function ipAddress(string $ip_address): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'ip_address' => $ip_address
         ]);
     }
 

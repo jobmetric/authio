@@ -26,7 +26,6 @@ class UserTokenFactory extends Factory
             'ip_address' => fake()->ipv4(),
             'logout_at' => null,
             'expired_at' => null,
-            'created_at' => now(),
         ];
     }
 
@@ -44,7 +43,7 @@ class UserTokenFactory extends Factory
     }
 
     /**
-     * Indicate that the model's token is token.
+     * Indicate that the model's token.
      *
      * @param string $token
      *
@@ -58,7 +57,7 @@ class UserTokenFactory extends Factory
     }
 
     /**
-     * Indicate that the model's token is user agent.
+     * Indicate that the model's user agent.
      *
      * @param string $user_agent
      *
@@ -72,7 +71,7 @@ class UserTokenFactory extends Factory
     }
 
     /**
-     * Indicate that the model's token is ip address.
+     * Indicate that the model's ip address.
      *
      * @param string $ip_address
      *
@@ -86,7 +85,7 @@ class UserTokenFactory extends Factory
     }
 
     /**
-     * Indicate that the model's token is logged out.
+     * Indicate that the model's logged out.
      *
      * @return static
      */
@@ -98,7 +97,7 @@ class UserTokenFactory extends Factory
     }
 
     /**
-     * Indicate that the model's token is expired.
+     * Indicate that the model's expired.
      *
      * @return static
      */
