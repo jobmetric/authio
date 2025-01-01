@@ -2,6 +2,7 @@
 
 namespace JobMetric\Authio\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,6 +11,19 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
+ * JobMetric\Authio\Models\User
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property Carbon $email_verified_at
+ * @property string $mobile_prefix
+ * @property string $mobile
+ * @property Carbon $mobile_verified_at
+ * @property Carbon $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ *
  * @method static ofName(string $name, bool $withTrashed = false)
  * @method static ofMobile(string $mobile_prefix, string $mobile, bool $withTrashed = false)
  * @method static ofEmail(string $email, bool $withTrashed = false)
@@ -55,10 +69,21 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'mobile_verified_at' => 'datetime',
+        'id' => 'integer',
+        'name' => 'string',
+        'email' => 'string',
         'email_verified_at' => 'datetime',
+        'mobile_prefix' => 'string',
+        'mobile' => 'string',
+        'mobile_verified_at' => 'datetime',
         'password' => 'hashed',
+        'remember_token' => 'string',
     ];
+
+    public function getTable()
+    {
+        return config('authio.tables.user', parent::getTable());
+    }
 
     /**
      * Scope a query to only include users of a given name.
@@ -75,6 +100,26 @@ class User extends Authenticatable
 
         if ($withTrashed) {
             $query->withTrashed();
+        }
+
+        return $query;
+    }
+
+    /**
+     * Scope a query to only include users of a given email.
+     *
+     * @param Builder $query
+     * @param string $email
+     * @param bool $withTrashed
+     *
+     * @return Builder
+     */
+    public function scopeOfEmail(Builder $query, string $email, bool $withTrashed = false): Builder
+    {
+        $query->where('email', $email);
+
+        if ($withTrashed) {
+            $query->withTrashed('deleted_at');
         }
 
         return $query;
@@ -105,23 +150,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Scope a query to only include users of a given email.
+     * now verified email
      *
-     * @param Builder $query
-     * @param string $email
-     * @param bool $withTrashed
-     *
-     * @return Builder
+     * @return bool
      */
-    public function scopeOfEmail(Builder $query, string $email, bool $withTrashed = false): Builder
+    public function nowVerifiedEmail(): bool
     {
-        $query->where('email', $email);
-
-        if ($withTrashed) {
-            $query->withTrashed('deleted_at');
-        }
-
-        return $query;
+        return $this->update(['email_verified_at' => now()]);
     }
 
     /**
@@ -132,15 +167,5 @@ class User extends Authenticatable
     public function nowVerifiedMobile(): bool
     {
         return $this->update(['mobile_verified_at' => now()]);
-    }
-
-    /**
-     * now verified email
-     *
-     * @return bool
-     */
-    public function nowVerifiedEmail(): bool
-    {
-        return $this->update(['email_verified_at' => now()]);
     }
 }
