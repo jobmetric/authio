@@ -17,4 +17,18 @@ return [
 
     "cache_time" => env("AUTHIO_CACHE_TIME", 0),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Table Name
+    |--------------------------------------------------------------------------
+    |
+    | Table name in database
+    */
+
+    "tables" => [
+        'user' => 'users',
+        'user_otp' => 'user_otps',
+        'user_token' => 'user_tokens',
+    ],
+
 ];
