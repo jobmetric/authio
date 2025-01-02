@@ -31,4 +31,14 @@ return [
         'user_token' => 'user_tokens',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Background Image
+    |--------------------------------------------------------------------------
+    |
+    | Background image for authio
+    */
+
+    "background_image" => env("AUTHIO_BACKGROUND_IMAGE", "bg7"),
+
 ];
