@@ -2,8 +2,8 @@
 
 namespace JobMetric\Authio\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Contracts\View\View;
+use JobMetric\Authio\Facades\Authio;
 use JobMetric\Authio\Http\Requests\AuthRequestRequest;
 use JobMetric\Domi\Facades\Domi;
 use JobMetric\Location\Facades\LocationCountry;
@@ -85,50 +85,7 @@ class AuthController extends Controller
 
     public function request(AuthRequestRequest $request)
     {
-        $input = $request->validated();
-
-        $data = [];
-        if($input['type'] == 'mobile') {
-            $mobile_prefix = $input['mobile_prefix'];
-            $mobile = $input['mobile'];
-
-            $user = User::ofMobile($mobile_prefix, $mobile, true)->first();
-
-            if($user) {
-                $data['type'] = 'login';
-            } else {
-                $data['type'] = 'register';
-
-                // add user
-                $user = User::create([
-                    'mobile_prefix' => $mobile_prefix,
-                    'mobile' => $mobile,
-                ]);
-
-                // register auth code and send
-                // send secret
-            }
-        } else {
-            $email = $input['email'];
-
-            $user = User::ofEmail($email, true)->first();
-
-            if($user) {
-                $data['type'] = 'login';
-            } else {
-                $data['type'] = 'register';
-
-                // add user
-                $user = User::create([
-                    'email' => $email,
-                ]);
-
-                // register auth code and send
-                // send secret
-            }
-        }
-
-        return response()->json($data);
+        return Authio::request($request->validated());
     }
 
     public function loginOtp()
