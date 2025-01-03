@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->string('name')->nullable()->change();
             $table->string('email')->nullable()->change();
             $table->string('password')->nullable()->change();
 
@@ -42,6 +43,7 @@ return new class extends Migration
 
             $table->dropColumn('deleted_at');
 
+            $table->string('name')->change();
             $table->string('email')->change();
             $table->string('password')->change();
         });
