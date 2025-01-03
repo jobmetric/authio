@@ -4,6 +4,15 @@
     user-select: none; /* Standard syntax */
 }
 
+.form-data input[type="number"]::-webkit-inner-spin-button,
+.form-data input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.form-data input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 .form-data,
 .form-auth-data-mode,
 .form-error,
