@@ -5,6 +5,9 @@ namespace JobMetric\Authio\Http\Controllers;
 use Illuminate\Contracts\View\View;
 use JobMetric\Authio\Facades\Authio;
 use JobMetric\Authio\Http\Requests\AuthRequestRequest;
+use JobMetric\Authio\Http\Requests\ResendOtpRequest;
+use JobMetric\Authio\Http\Resources\RequestResource;
+use JobMetric\Authio\Http\Resources\ResendResource;
 use JobMetric\Domi\Facades\Domi;
 use JobMetric\Location\Facades\LocationCountry;
 use JobMetric\Panelio\Http\Controllers\Controller;
@@ -83,7 +86,15 @@ class AuthController extends Controller
         }
     }
 
-    public function request(AuthRequestRequest $request)
+    /**
+     * Request data
+     *
+     * @param AuthRequestRequest $request
+     *
+     * @return RequestResource
+     * @throws Throwable
+     */
+    public function request(AuthRequestRequest $request): RequestResource
     {
         return Authio::request($request->validated());
     }
@@ -92,8 +103,17 @@ class AuthController extends Controller
     {
     }
 
-    public function resendOtp()
+    /**
+     * resend otp
+     *
+     * @param ResendOtpRequest $request
+     *
+     * @return ResendResource
+     * @throws Throwable
+     */
+    public function resendOtp(ResendOtpRequest $request): ResendResource
     {
+        return Authio::resend($request->validated());
     }
 
     public function loginPassword()
