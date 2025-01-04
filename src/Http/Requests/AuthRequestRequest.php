@@ -50,8 +50,7 @@ class AuthRequestRequest extends FormRequest
             'email' => [
                 'nullable',
                 'required_if:type,==,' . LoginTypeEnum::EMAIL(), 'email',
-                'max:255',
-                'unique:' . $user_table . ',email'
+                'max:255'
             ],
 
             'hash' => [
