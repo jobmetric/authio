@@ -63,7 +63,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="loading">
+                    <div id="loading" class="rounded-4">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="200" height="200">
                             <circle r="20" fill="#013ca6" cy="50" cx="30">
                                 <animate begin="-0.5s" values="30;70;30" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" attributeName="cx"/>
