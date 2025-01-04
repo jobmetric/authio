@@ -7,9 +7,13 @@ const authio = {
         },
     },
     pages: {
+        secret: null,
+        has_password: false,
+        source: null,
+        login_type: null,
         auth: {
             type: 'mobile',
-            changeType: function(element, e){
+            changeType: function (element, e) {
                 e.preventDefault()
                 $('.form-auth-data-mode,.form-auth-change-data').removeClass('active')
                 $(element).addClass('active')
@@ -17,7 +21,7 @@ const authio = {
                 $('#form-auth-' + elementType).addClass('active')
                 authio.pages.auth.type = elementType
             },
-            send: function(e){
+            send: function (e) {
                 e.preventDefault()
                 $.ajax({
                     url: localize.auth.route.request,
@@ -30,34 +34,52 @@ const authio = {
                         mobile: $('#mobile').val(),
                         email: $('#email').val(),
                     },
-                    beforeSend: function(){
-                        // $('#loading').addClass('active')
+                    beforeSend: function () {
+                        authio.loading.show()
                         $('.form-error').removeClass('active').text('')
                     },
-                    complete: function(){
-                        $('#loading').removeClass('active')
+                    complete: function () {
+                        authio.loading.hide()
                     },
-                    success: function(json){
-                        $('.form-data').removeClass('active')
-                        $('#form-code').addClass('active')
-                        $('#code-1').focus()
+                    success: function (json) {
+                        authio.pages.secret = json.data.secret
+                        authio.pages.has_password = json.data.has_password
+                        authio.pages.source = json.data.source
+                        authio.pages.login_type = json.data.type
+
+                        if (json.data.has_password) {
+                            authio.pages.password.show()
+                        } else {
+                            authio.pages.code.show()
+                        }
                     },
-                    error: function(res){
+                    error: function (res) {
                         toastr.error(res.responseJSON.message)
-                        $.each(res.responseJSON.errors, function (field, value){
+                        $.each(res.responseJSON.errors, function (field, value) {
                             $('#error-' + field).addClass('active').text(value)
                         })
                     },
                 })
             },
-            backTo: function(e){
+            backTo: function (e) {
                 e.preventDefault()
                 $('.form-data').removeClass('active')
                 $('#form-auth').addClass('active')
             },
+            enterKey: function (e) {
+                if (e.keyCode === 13) {
+                    e.preventDefault()
+                    authio.pages.auth.send(e)
+                }
+            },
         },
         code: {
-            fill: function (element, e){
+            show: function () {
+                $('.form-data').removeClass('active')
+                $('#form-code').addClass('active')
+                $('#code-1').focus()
+            },
+            fill: function (element, e) {
                 let backspaceKey = 8;
                 let deleteKey = 46;
                 let tabKey = 9;
@@ -85,7 +107,7 @@ const authio = {
 
                 if (e.keyCode === backspaceKey || e.keyCode === deleteKey || e.keyCode === escapeKey) {
                     $(element).val('')
-                    setTimeout(function (){
+                    setTimeout(function () {
                         if (element_number > 1) {
                             $('#code-' + (element_number - 1)).focus()
                             e.preventDefault()
@@ -118,21 +140,98 @@ const authio = {
 
                 if ($.inArray(e.keyCode, numberKeys) !== -1) {
                     $(element).val($(element).val().substring(0, 0))
-                    setTimeout(function(){
+                    setTimeout(function () {
                         if (element_number < maxCode) {
                             $('#code-' + (element_number + 1)).focus()
                         }
-                    },30)
+                    }, 30)
                 }
             },
-            send: function(){}
+            send: function () {
+            },
+            resend: function () {
+                $('#btn-resend').removeClass('active')
+                $('#timer').addClass('active')
+                authio.timer.start(60)
+            }
         },
-        password: {},
-        authenticator: {},
-        selection: {},
+        password: {
+            show: function () {
+                $('.form-data').removeClass('active')
+                $('#form-password').addClass('active')
+                $('#password').focus()
+            },
+            changeType: {
+                toggle: function (element) {
+                    if ($(element).val().length > 0) {
+                        $('#password + div').addClass('active')
+                    } else {
+                        $('#password + div').removeClass('active')
+                    }
+                },
+                action: function (element) {
+                    let type = $('#password').attr('type')
+                    if (type === 'password') {
+                        $('#password').attr('type', 'text')
+                        $(element).html(`<i class="ki-duotone ki-eye-slash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>`)
+                    } else {
+                        $('#password').attr('type', 'password')
+                        $(element).html(`<i class="ki-duotone ki-eye fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>`)
+                    }
+                },
+            },
+            send: function (e) {
+                e.preventDefault()
+                authio.pages.selection.show()
+            }
+        },
+        authenticator: {
+            show: function () {
+                $('.form-data').removeClass('active')
+                $('#form-authenticator').addClass('active')
+            },
+        },
+        selection: {
+            show: function () {
+                $('.form-data').removeClass('active')
+                $('#form-selection').addClass('active')
+            },
+            select: function () {
+                authio.loading.show()
+                setTimeout(function () {
+                    authio.loading.hide()
+                }, 3000)
+            },
+        },
+    },
+    loading: {
+        show: function () {
+            $('#loading').addClass('active')
+        },
+        hide: function () {
+            $('#loading').removeClass('active')
+        }
+    },
+    timer: {
+        interval: null,
+        start: function (timer) {
+            if (authio.timer.interval) {
+                clearInterval(authio.timer.interval)
+            }
+            $('#timer').text(timer);
+            authio.timer.interval = setInterval(function () {
+                $('#timer').text(--timer);
+
+                if (!timer) {
+                    clearInterval(authio.timer.interval)
+                    $('#timer').removeClass('active')
+                    $('#btn-resend').addClass('active')
+                }
+            }, 1000);
+        }
     },
     config: {
-        toast: function(){
+        toast: function () {
             toastr.options = {
                 "closeButton": false,
                 "debug": true,
@@ -151,89 +250,9 @@ const authio = {
                 "hideMethod": "fadeOut"
             };
         },
-        timer: {
-            interval: null,
-            start: function (timer) {
-                if(authio.config.timer.interval) {
-                    clearInterval(authio.config.timer.interval)
-                }
-                $('#timer').text(timer);
-                authio.config.timer.interval = setInterval(function () {
-                    $('#timer').text(--timer);
-
-                    if (!timer) {
-                        clearInterval(authio.config.timer.interval)
-                        $('#timer').removeClass('active')
-                        $('#btn-resend').addClass('active')
-                    }
-                }, 1000);
-            }
-        },
     },
 }
 
-$(document).ready(function (){
-
-
-    $(document).on('click', '#btn-resend', function (e){
-        $('#btn-resend').removeClass('active')
-        $('#timer').addClass('active')
-        startTimer(5)
-
-    })
-
-    $(document).on('click', '#btn-login-by-password', function (e){
-        $('.form-data').removeClass('active')
-        $('#form-password').addClass('active')
-    })
-
-    // form password
-    $(document).on('click', '#btn-login-by-code', function (e){
-        $('.form-data').removeClass('active')
-        $('#form-code').addClass('active')
-    })
-
-    $(document).on('click', '#btn-password', function (e){
-        e.preventDefault()
-        $('.form-data').removeClass('active')
-        $('#form-authenticator').addClass('active')
-    })
-
-    $(document).on('click', '#change-type-password', function (e){
-        let type = $('#password').attr('type')
-        if (type === 'password') {
-            $('#password').attr('type', 'text')
-            $(this).html('<i class="ki-duotone ki-eye-slash fs-1">\n' +
-                '             <span class="path1"></span>\n' +
-                '             <span class="path2"></span>\n' +
-                '             <span class="path3"></span>\n' +
-                '             <span class="path4"></span>\n' +
-                '         </i>')
-        } else {
-            $('#password').attr('type', 'password')
-            $(this).html('<i class="ki-duotone ki-eye fs-1">\n' +
-                '             <span class="path1"></span>\n' +
-                '             <span class="path2"></span>\n' +
-                '             <span class="path3"></span>\n' +
-                '         </i>')
-        }
-    })
-
-    $(document).on('keyup', '#password', function (e){
-        if ($(this).val().length > 0) {
-            $('#change-type-password').addClass('active')
-        } else {
-            $('#change-type-password').removeClass('active')
-        }
-    })
-
-    // form authenticator
-
-    // form selection
-    $(document).on('click', '.btn-selection', function (e){
-        $('#loading').addClass('active')
-        setTimeout(function (){
-            $('#loading').removeClass('active')
-        }, 3000)
-    })
+$(document).ready(function () {
+    authio.init.ready()
 })
