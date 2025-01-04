@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int $id
  * @property int $user_id
+ * @property User $user
  * @property string $source
  * @property string $secret
  * @property string $otp
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $updated_at
  *
  * @method static ofUser(int $user_id)
+ * @method static ofSecretNotUsed(string $secret)
  * @method static create(array $array)
  */
 class UserOtp extends Model
@@ -82,6 +84,19 @@ class UserOtp extends Model
     public function scopeOfUser(Builder $query, int $user_id): Builder
     {
         return $query->where('user_id', $user_id);
+    }
+
+    /**
+     * Scope a query to only include user otp of a given secret not used.
+     *
+     * @param Builder $query
+     * @param string $secret
+     *
+     * @return Builder
+     */
+    public function scopeOfSecretNotUsed(Builder $query, string $secret): Builder
+    {
+        return $query->where('secret', $secret)->whereNull('used_at');
     }
 
     /**
