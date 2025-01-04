@@ -20,6 +20,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $mobile_prefix
  * @property string $mobile
  * @property Carbon $mobile_verified_at
+ * @property string $password
  * @property Carbon $deleted_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
