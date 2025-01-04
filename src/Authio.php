@@ -2,6 +2,7 @@
 
 namespace JobMetric\Authio;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Str;
 use JobMetric\Authio\Enums\LoginTypeEnum;
@@ -9,14 +10,27 @@ use JobMetric\Authio\Enums\OtpTypeEnum;
 use JobMetric\Authio\Events\AfterRegisterEvent;
 use JobMetric\Authio\Events\SendOtpEmailEvent;
 use JobMetric\Authio\Events\SendOtpSmsEvent;
+use JobMetric\Authio\Exceptions\ExpireSecretException;
+use JobMetric\Authio\Exceptions\IpNotMatchException;
+use JobMetric\Authio\Exceptions\ResendTryCountException;
 use JobMetric\Authio\Exceptions\UserDeletedException;
 use JobMetric\Authio\Http\Resources\RequestResource;
+use JobMetric\Authio\Http\Resources\ResendResource;
 use JobMetric\Authio\Models\User;
 use JobMetric\Authio\Models\UserOtp;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Throwable;
 
 class Authio
 {
+    /**
+     * Request data
+     *
+     * @param array $params
+     *
+     * @return RequestResource
+     * @throws UserDeletedException
+     */
     public function request(array $params = []): RequestResource
     {
         $type = $params['type'];
@@ -93,9 +107,73 @@ class Authio
         return RequestResource::make($response);
     }
 
-    public function login()
+    /**
+     * Resend Otp
+     *
+     * @param array $params
+     *
+     * @return ResendResource
+     * @throws Throwable
+     */
+    public function resend(array $params = []): ResendResource
     {
+        $secret = $params['secret'];
+        $hash = $params['hash'] ?? null;
 
+        /**
+         * @var UserOtp $user_otp
+         */
+        global $user_otp;
+
+        if (is_null($user_otp)) {
+            $user_otp = UserOtp::ofSecretNotUsed($secret)->with('user')->first();
+        }
+
+        $response = [
+            'source' => $user_otp->source,
+            'secret' => $user_otp->secret
+        ];
+
+        // if ip not equal in secret record
+        if ($user_otp->ip_address != request()->ip()) {
+            throw new IpNotMatchException;
+        }
+
+        $expire_reuse = Carbon::parse($user_otp->updated_at)->diffInRealSeconds();
+
+        // if expire reuse more than expire time config
+        if ($expire_reuse > config('authio.otp.expire_time')) {
+            throw new ExpireSecretException;
+        }
+
+        // if try count more than try count config
+        if ($user_otp->try_count > config('authio.otp.try_count')) {
+            // @todo: ban ip => config('define.otp.ban_ip') second
+
+            throw new ResendTryCountException;
+        }
+
+        if ($expire_reuse > config('authio.otp.expire_reuse') || ($user_otp->try_count == 0 && !is_null($user_otp->user->password))) {
+            $user_otp->nowTry();
+
+            // $user_otp->user->addActivity(TableUserActivityFieldTypeEnum::RESEND_OTP);
+
+            if ($user_otp->source == LoginTypeEnum::MOBILE()) {
+                if (config('authio.enable_send_sms') || env('APP_ENV') == 'production') {
+                    event(new SendOtpSmsEvent($user_otp->user, $user_otp->otp, $hash));
+                }
+            } else {
+                if (config('authio.enable_send_email') || env('APP_ENV') == 'production') {
+                    event(new SendOtpEmailEvent($user_otp->user, $user_otp->otp));
+                }
+            }
+
+            $response['code'] = $this->getCode(OtpTypeEnum::UPDATE, config('authio.otp.expire_reuse'), $user_otp->try_count);
+        } else {
+            $response['code'] = $this->getCode(OtpTypeEnum::LOCKED, config('authio.otp.expire_reuse') - $expire_reuse, $user_otp->try_count);
+        }
+
+        return ResendResource::make($response);
     }
 
     /**

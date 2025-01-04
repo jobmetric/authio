@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @see \JobMetric\Authio\Authio
  *
- * @method static \JobMetric\Authio\Http\Resources\RequestResource request(array $data)
+ * @method static \JobMetric\Authio\Http\Resources\RequestResource request(array $params = [])
+ * @method static \JobMetric\Authio\Http\Resources\ResendResource resend(array $params = [])
  */
 class Authio extends Facade
 {
