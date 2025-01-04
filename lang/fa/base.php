@@ -63,7 +63,10 @@ return [
     ],
 
     "exceptions" => [
-        "user_deleted" => "کاربر :name حذف شده است."
+        "user_deleted" => "کاربر :name حذف شده است.",
+        "ip_not_match" => "آی پی شما با آی پی ثبت شده برای این کاربر مطابقت ندارد.",
+        "expire_secret" => "کد امنیتی منقضی شده است.",
+        "resend_try_count" => "تعداد ارسال مجدد بیش از حد مجاز است.",
     ],
 
     "rules" => [
@@ -72,7 +75,8 @@ return [
             "mobile_prefix_not_found" => "کشوری با پیش شماره :prefix پیدا نشد.",
             "validation_regex_missing" => "تنظیمات شماره‌گذاری کشور :country هنوز کامل نشده است.",
             "invalid_mobile_format" => "شماره موبایل وارد شده با الگوی شماره‌گذاری کشور :country مطابقت ندارد.",
-        ]
+        ],
+        "secret_exists" => "این :attribute برای این صفحه قبلا استفاده شده است.",
     ],
 
 ];

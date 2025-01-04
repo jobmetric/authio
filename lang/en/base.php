@@ -63,7 +63,10 @@ return [
     ],
 
     "exceptions" => [
-        "user_deleted" => "کاربر :name حذف شده است."
+        "user_deleted" => "User :name has been deleted.",
+        "ip_not_match" => "Your IP does not match the IP registered for this user.",
+        "expire_secret" => "The security code has expired.",
+        "resend_try_count" => "The number of resends is exceeded.",
     ],
 
     "rules" => [
@@ -72,7 +75,8 @@ return [
             "mobile_prefix_not_found" => "No country found with the prefix :prefix.",
             "validation_regex_missing" => "The numbering configuration for the country :country is incomplete.",
             "invalid_mobile_format" => "The provided mobile number does not match the numbering format of :country.",
-        ]
+        ],
+        "secret_exists" => "The :attribute for this page is already used.",
     ],
 
 ];
