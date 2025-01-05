@@ -32,7 +32,8 @@
         "jobmetric/laravel-package-core": "^1.18.6",
         "jobmetric/domi": "^1.13.1",
         "jobmetric/panelio": "^1.15.3",
-        "jobmetric/laravel-location": "^1.2.2"
+        "jobmetric/laravel-location": "^1.2.2",
+        "tymon/jwt-auth": "^2.1"
     },
     "autoload": {
         "psr-4": {
