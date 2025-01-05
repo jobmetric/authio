@@ -3,11 +3,12 @@
 namespace JobMetric\Authio\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use JobMetric\Authio\Facades\Authio;
 use JobMetric\Authio\Http\Requests\AuthRequestRequest;
+use JobMetric\Authio\Http\Requests\LoginOtpRequest;
+use JobMetric\Authio\Http\Requests\LoginPasswordRequest;
 use JobMetric\Authio\Http\Requests\ResendOtpRequest;
-use JobMetric\Authio\Http\Resources\RequestResource;
-use JobMetric\Authio\Http\Resources\ResendResource;
 use JobMetric\Domi\Facades\Domi;
 use JobMetric\Location\Facades\LocationCountry;
 use JobMetric\Panelio\Http\Controllers\Controller;
@@ -91,16 +92,33 @@ class AuthController extends Controller
      *
      * @param AuthRequestRequest $request
      *
-     * @return RequestResource
+     * @return JsonResponse
      * @throws Throwable
      */
-    public function request(AuthRequestRequest $request): RequestResource
+    public function request(AuthRequestRequest $request): JsonResponse
     {
-        return Authio::request($request->validated());
+        try {
+            return $this->response(Authio::request($request->validated()));
+        } catch (Throwable $exception) {
+            return $this->response(message: $exception->getMessage(), status: $exception->getCode());
+        }
     }
 
-    public function loginOtp()
+    /**
+     * Login otp
+     *
+     * @param LoginOtpRequest $request
+     *
+     * @return JsonResponse
+     * @throws Throwable
+     */
+    public function loginOtp(LoginOtpRequest $request): JsonResponse
     {
+        try {
+            return $this->response(Authio::loginOtp($request->validated()));
+        } catch (Throwable $exception) {
+            return $this->response(message: $exception->getMessage(), status: $exception->getCode());
+        }
     }
 
     /**
@@ -108,15 +126,32 @@ class AuthController extends Controller
      *
      * @param ResendOtpRequest $request
      *
-     * @return ResendResource
+     * @return JsonResponse
      * @throws Throwable
      */
-    public function resendOtp(ResendOtpRequest $request): ResendResource
+    public function resendOtp(ResendOtpRequest $request): JsonResponse
     {
-        return Authio::resend($request->validated());
+        try {
+            return $this->response(Authio::resend($request->validated()));
+        } catch (Throwable $exception) {
+            return $this->response(message: $exception->getMessage(), status: $exception->getCode());
+        }
     }
 
-    public function loginPassword()
+    /**
+     * Login password
+     *
+     * @param LoginPasswordRequest $request
+     *
+     * @return JsonResponse
+     * @throws Throwable
+     */
+    public function loginPassword(LoginPasswordRequest $request): JsonResponse
     {
+        try {
+            return $this->response(Authio::loginPassword($request->validated()));
+        } catch (Throwable $exception) {
+            return $this->response(message: $exception->getMessage(), status: $exception->getCode());
+        }
     }
 }
