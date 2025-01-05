@@ -67,6 +67,16 @@ return [
         "ip_not_match" => "Your IP does not match the IP registered for this user.",
         "expire_secret" => "The security code has expired.",
         "resend_try_count" => "The number of resends is exceeded.",
+        "user_not_match" => "The user does not match the provided information.",
+        "unauthorized" => "You are not authorized.",
+        "password_not_found" => "Password not found.",
+    ],
+
+    "messages" => [
+        "request" => "The check is done and you will go to the next step.",
+        "login" => "You will be logged into your panel in a few moments.",
+        "resend" => "The code has been sent again.",
+        "locked" => "Please try again after :time seconds.",
     ],
 
     "rules" => [
