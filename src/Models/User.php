@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * JobMetric\Authio\Models\User
@@ -30,7 +31,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static ofEmail(string $email, bool $withTrashed = false)
  * @method static create(array $array)
  */
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens,
         HasFactory,
@@ -84,6 +85,30 @@ class User extends Authenticatable
     public function getTable()
     {
         return config('authio.tables.user', parent::getTable());
+    }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier(): mixed
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [
+            'email' => $this->email,
+            'mobile_prefix' => $this->mobile_prefix,
+            'mobile' => $this->mobile,
+        ];
     }
 
     /**
