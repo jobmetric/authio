@@ -4,22 +4,32 @@ namespace JobMetric\Authio;
 
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use JobMetric\Authio\Enums\LoginTypeEnum;
 use JobMetric\Authio\Enums\OtpTypeEnum;
+use JobMetric\Authio\Events\AddUserTokenEvent;
 use JobMetric\Authio\Events\AfterRegisterEvent;
+use JobMetric\Authio\Events\LoginEvent;
+use JobMetric\Authio\Events\RegisteredEvent;
 use JobMetric\Authio\Events\SendOtpEmailEvent;
 use JobMetric\Authio\Events\SendOtpSmsEvent;
 use JobMetric\Authio\Exceptions\ExpireSecretException;
 use JobMetric\Authio\Exceptions\IpNotMatchException;
+use JobMetric\Authio\Exceptions\PasswordNotFoundException;
 use JobMetric\Authio\Exceptions\ResendTryCountException;
+use JobMetric\Authio\Exceptions\UnauthorizedException;
 use JobMetric\Authio\Exceptions\UserDeletedException;
+use JobMetric\Authio\Exceptions\UserNotMatchException;
 use JobMetric\Authio\Http\Resources\RequestResource;
 use JobMetric\Authio\Http\Resources\ResendResource;
+use JobMetric\Authio\Http\Resources\TokenResource;
 use JobMetric\Authio\Models\User;
 use JobMetric\Authio\Models\UserOtp;
+use JobMetric\Authio\Models\UserToken;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class Authio
 {
@@ -28,10 +38,10 @@ class Authio
      *
      * @param array $params
      *
-     * @return RequestResource
+     * @return array
      * @throws UserDeletedException
      */
-    public function request(array $params = []): RequestResource
+    public function request(array $params = []): array
     {
         $type = $params['type'];
         $mobile_prefix = $params['mobile_prefix'] ?? null;
@@ -87,10 +97,9 @@ class Authio
         }
 
         $response['secret'] = Str::random(30);
+        $otp = $this->addOtp($type, $user, $response['secret']);
 
         if ($has_otp) {
-            $otp = $this->addOtp($type, $user, $response['secret']);
-
             if ($type == LoginTypeEnum::MOBILE()) {
                 if (config('authio.enable_send_sms') || env('APP_ENV') == 'production') {
                     event(new SendOtpSmsEvent($user, $otp, $hash));
@@ -104,7 +113,116 @@ class Authio
             }
         }
 
-        return RequestResource::make($response);
+        return [
+            'ok' => true,
+            'message' => trans('authio::base.messages.request'),
+            'data' => RequestResource::make($response),
+            'status' => 200
+        ];
+    }
+
+    /**
+     * Login Opt
+     *
+     * @param array $params
+     *
+     * @return array
+     * @throws Throwable
+     */
+    public function loginOtp(array $params = []): array
+    {
+        $otp = $params['otp'];
+
+        /**
+         * @var UserOtp $user_otp
+         */
+        global $user_otp;
+
+        // if otp not equal in secret record
+        if ($user_otp->otp != $otp) {
+            throw new UserNotMatchException;
+        }
+
+        // if token not generate
+        try {
+            $token = JWTAuth::fromUser($user_otp->user);
+        } catch (Exception $exception) {
+            throw new UnauthorizedException;
+        }
+
+        // $user_otp->user->addActivity(TableUserActivityFieldTypeEnum::LOGIN_WITH_OTP);
+        $this->addToken($user_otp->user, $token, config('jwt.ttl') * 60);
+
+        $user_otp->nowUsed();
+
+        // if for new user
+        if (is_null($user_otp->user->mobile_verified_at)) {
+            $user_otp->user->nowVerifiedMobile();
+
+            event(new RegisteredEvent($user_otp->user));
+        } else {
+            event(new LoginEvent($user_otp->user));
+        }
+
+        return [
+            'ok' => true,
+            'message' => trans('authio::base.messages.login'),
+            'data' => TokenResource::make([
+                'token' => $token,
+                'user' => $user_otp->user,
+            ]),
+            'status' => 200
+        ];
+    }
+
+    /**
+     * Login Password
+     *
+     * @param array $params
+     *
+     * @return array
+     * @throws Throwable
+     */
+    public function loginPassword(array $params = []): array
+    {
+        $password = $params['password'];
+
+        /**
+         * @var UserOtp $user_otp
+         */
+        global $user_otp;
+
+        if (is_null($user_otp->user->password)) {
+            throw new PasswordNotFoundException;
+        }
+
+        if (!Hash::check($password, $user_otp->user->password)) {
+            throw new UserNotMatchException;
+        }
+
+        // if token not generate
+        try {
+            $token = JWTAuth::fromUser($user_otp->user);
+        } catch (Exception $exception) {
+            throw new UnauthorizedException;
+        }
+
+        //$user_otp->user->addActivity(TableUserActivityFieldTypeEnum::LOGIN_WITH_PASSWORD);
+        $this->addToken($user_otp->user, $token, config('jwt.ttl') * 60);
+
+        $user_otp->nowUsed();
+
+        event(new LoginEvent($user_otp->user));
+
+        return [
+            'ok' => true,
+            'message' => trans('authio::base.messages.login'),
+            'data' => TokenResource::make([
+                'token' => $token,
+                'user' => $user_otp->user,
+            ]),
+            'status' => 200
+        ];
     }
 
     /**
@@ -112,10 +230,10 @@ class Authio
      *
      * @param array $params
      *
-     * @return ResendResource
+     * @return array
      * @throws Throwable
      */
-    public function resend(array $params = []): ResendResource
+    public function resend(array $params = []): array
     {
         $secret = $params['secret'];
         $hash = $params['hash'] ?? null;
@@ -169,11 +287,20 @@ class Authio
             }
 
             $response['code'] = $this->getCode(OtpTypeEnum::UPDATE, config('authio.otp.expire_reuse'), $user_otp->try_count);
+
+            $message = trans('authio::base.messages.resend');
         } else {
             $response['code'] = $this->getCode(OtpTypeEnum::LOCKED, config('authio.otp.expire_reuse') - $expire_reuse, $user_otp->try_count);
+
+            $message = trans('authio::base.messages.locked', ['time' => config('authio.otp.expire_reuse') - $expire_reuse]);
         }
 
-        return ResendResource::make($response);
+        return [
+            'ok' => true,
+            'message' => $message,
+            'data' => ResendResource::make($response),
+            'status' => 200
+        ];
     }
 
     /**
@@ -234,5 +361,32 @@ class Authio
             'max_try' => config('authio.otp.try_count'),
             'expire_time' => config('authio.otp.expire_time'),
         ];
+    }
+
+    /**
+     * Add Token
+     *
+     * @param User $user
+     * @param string $token
+     * @param int|null $ttl
+     *
+     * @return void
+     */
+    private function addToken(User $user, string $token, int $ttl = null): void
+    {
+        $user_token = new UserToken;
+
+        $user_token->user_id = $user->id;
+        $user_token->token = $token;
+        $user_token->user_agent = request()->userAgent();
+        $user_token->ip_address = request()->ip();
+
+        if ($ttl) {
+            $user_token->expired_at = Carbon::parse(time())->addSeconds($ttl);
+        }
+
+        $user_token->save();
+
+        event(new AddUserTokenEvent($user_token));
     }
 }
