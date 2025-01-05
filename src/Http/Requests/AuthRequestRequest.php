@@ -4,7 +4,6 @@ namespace JobMetric\Authio\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use JobMetric\Authio\Enums\LoginTypeEnum;
 use JobMetric\Authio\Rules\MobileRule;
 
@@ -25,7 +24,6 @@ class AuthRequestRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user_table = config('authio.tables.user');
         return [
             'type' => [
                 'required',
