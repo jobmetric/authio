@@ -1,9 +1,9 @@
 "use strict"
 
-const authio = {
+const auth = {
     init: {
         ready: function () {
-            authio.config.toast()
+            auth.config.toast()
         },
     },
     pages: {
@@ -19,38 +19,40 @@ const authio = {
                 $(element).addClass('active')
                 let elementType = $(element).data('type')
                 $('#form-auth-' + elementType).addClass('active')
-                authio.pages.auth.type = elementType
+                auth.pages.auth.type = elementType
             },
             send: function (e) {
                 e.preventDefault()
                 $.ajax({
-                    url: localize.auth.route.request,
+                    url: getLocalize('auth.route.request'),
                     method: 'post',
                     dataType: 'json',
                     data: {
                         _token: getCsrfToken(),
-                        type: authio.pages.auth.type,
+                        type: auth.pages.auth.type,
                         mobile_prefix: $('#mobile-prefix').val(),
                         mobile: $('#mobile').val(),
                         email: $('#email').val(),
                     },
                     beforeSend: function () {
-                        authio.loading.show()
+                        auth.loading.show()
                         $('.form-error').removeClass('active').text('')
                     },
                     complete: function () {
-                        authio.loading.hide()
+                        auth.loading.hide()
                     },
                     success: function (json) {
-                        authio.pages.secret = json.data.secret
-                        authio.pages.has_password = json.data.has_password
-                        authio.pages.source = json.data.source
-                        authio.pages.login_type = json.data.type
+                        auth.pages.secret = json.data.secret
+                        auth.pages.has_password = json.data.has_password
+                        auth.pages.source = json.data.source
+                        auth.pages.login_type = json.data.type
 
                         if (json.data.has_password) {
-                            authio.pages.password.show()
+                            auth.pages.password.show()
                         } else {
-                            authio.pages.code.show()
+                            auth.timer.start(json.data.code.timer)
+
+                            auth.pages.code.show()
                         }
                     },
                     error: function (res) {
@@ -69,7 +71,7 @@ const authio = {
             enterKey: function (e) {
                 if (e.keyCode === 13) {
                     e.preventDefault()
-                    authio.pages.auth.send(e)
+                    auth.pages.auth.send(e)
                 }
             },
         },
@@ -135,6 +137,7 @@ const authio = {
                 if (e.keyCode === enterKey && $(element).data('code-number') === 5) {
                     // submit code
                     e.preventDefault()
+                    auth.pages.code.send(e)
                     return
                 }
 
@@ -147,13 +150,80 @@ const authio = {
                     }, 30)
                 }
             },
-            send: function () {
+            getOtp: function () {
+                let otp = '';
+                for (let i = 1; i <= 5; i++) {
+                    otp += $(`#code-${i}`).val();
+                }
+                return otp;
+            },
+            send: function (e) {
+                e.preventDefault()
+                $.ajax({
+                    url: getLocalize('auth.route.otp'),
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        _token: getCsrfToken(),
+                        secret: auth.pages.secret,
+                        otp: auth.pages.code.getOtp(),
+                    },
+                    beforeSend: function () {
+                        auth.loading.show()
+                        $('.form-error').removeClass('active').text('')
+                    },
+                    complete: function () {
+                        auth.loading.hide()
+                    },
+                    success: function (json) {
+                        toastr.success(json.message)
+
+                        authio.token.set(json.data.token);
+
+                        let backTo = getQueryParam('back')
+                        if (backTo) {
+                            window.location.href = backTo
+                        } else {
+                            window.location.href = '/'
+                        }
+                    },
+                    error: function (res) {
+                        toastr.error(res.responseJSON.message)
+                        $.each(res.responseJSON.errors, function (field, value) {
+                            $('#error-' + field).addClass('active').text(value)
+                        })
+                    },
+                })
             },
             resend: function () {
-                $('#btn-resend').removeClass('active')
-                $('#timer').addClass('active')
-                authio.timer.start(60)
-            }
+                $.ajax({
+                    url: getLocalize('auth.route.resend'),
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        _token: getCsrfToken(),
+                        secret: auth.pages.secret,
+                    },
+                    beforeSend: function () {
+                        auth.loading.show()
+                        $('.form-error').removeClass('active').text('')
+                    },
+                    complete: function () {
+                        auth.loading.hide()
+                    },
+                    success: function (json) {
+                        toastr.success(json.message)
+
+                        auth.timer.start(json.data.code.timer)
+                    },
+                    error: function (res) {
+                        toastr.error(res.responseJSON.message)
+                        $.each(res.responseJSON.errors, function (field, value) {
+                            $('#error-' + field).addClass('active').text(value)
+                        })
+                    },
+                })
+            },
         },
         password: {
             show: function () {
@@ -182,8 +252,46 @@ const authio = {
             },
             send: function (e) {
                 e.preventDefault()
-                authio.pages.selection.show()
-            }
+                $.ajax({
+                    url: getLocalize('auth.route.password'),
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        _token: getCsrfToken(),
+                        secret: auth.pages.secret,
+                        password: $('#password').val(),
+                    },
+                    beforeSend: function () {
+                        auth.loading.show()
+                        $('.form-error').removeClass('active').text('')
+                    },
+                    complete: function () {
+                        auth.loading.hide()
+                    },
+                    success: function (json) {
+                        toastr.success(json.message)
+
+                        authio.token.set(json.data.token);
+
+                        let backTo = getQueryParam('back')
+                        if (backTo) {
+                            window.location.href = backTo
+                        }
+                    },
+                    error: function (res) {
+                        toastr.error(res.responseJSON.message)
+                        $.each(res.responseJSON.errors, function (field, value) {
+                            $('#error-' + field).addClass('active').text(value)
+                        })
+                    },
+                })
+            },
+            enterKey: function (e) {
+                if (e.keyCode === 13) {
+                    e.preventDefault()
+                    auth.pages.password.send(e)
+                }
+            },
         },
         authenticator: {
             show: function () {
@@ -197,9 +305,9 @@ const authio = {
                 $('#form-selection').addClass('active')
             },
             select: function () {
-                authio.loading.show()
+                auth.loading.show()
                 setTimeout(function () {
-                    authio.loading.hide()
+                    auth.loading.hide()
                 }, 3000)
             },
         },
@@ -215,17 +323,16 @@ const authio = {
     timer: {
         interval: null,
         start: function (timer) {
-            if (authio.timer.interval) {
-                clearInterval(authio.timer.interval)
+            if (auth.timer.interval) {
+                clearInterval(auth.timer.interval)
             }
-            $('#timer').text(timer);
-            authio.timer.interval = setInterval(function () {
+            $('#timer').addClass('active').text(timer);
+            auth.timer.interval = setInterval(function () {
                 $('#timer').text(--timer);
 
                 if (!timer) {
-                    clearInterval(authio.timer.interval)
+                    clearInterval(auth.timer.interval)
                     $('#timer').removeClass('active')
-                    $('#btn-resend').addClass('active')
                 }
             }, 1000);
         }
@@ -254,5 +361,5 @@ const authio = {
 }
 
 $(document).ready(function () {
-    authio.init.ready()
+    auth.init.ready()
 })
