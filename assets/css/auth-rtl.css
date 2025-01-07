@@ -17,14 +17,14 @@
 .form-auth-data-mode,
 .form-error,
 #timer,
-#timer + a {
+#timer.active + a {
     display: none;
 }
 .form-data.active,
 .form-auth-data-mode.active,
 .form-error.active,
 #timer.active,
-#timer + a.active {
+#timer + a {
     display: block;
 }
 #loading {
