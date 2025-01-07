@@ -12,8 +12,8 @@
                     <div class="d-flex justify-content-between align-items-center mb-5">
                         <span class="fs-4 fw-semibold">{{ trans('authio::base.page.auth.login_by') }}</span>
                         <div class="nav-group nav-group-outline">
-                            <button class="form-auth-change-data btn btn-color-gray-600 btn-active btn-active-secondary fs-6 px-4 py-1 me-2 active" onclick="authio.pages.auth.changeType(this, event)" data-type="mobile">{{ trans('authio::base.page.auth.mobile') }}</button>
-                            <button class="form-auth-change-data btn btn-color-gray-600 btn-active btn-active-secondary fs-6 px-4 py-1" onclick="authio.pages.auth.changeType(this, event)" data-type="email">{{ trans('authio::base.page.auth.email') }}</button>
+                            <button class="form-auth-change-data btn btn-color-gray-600 btn-active btn-active-secondary fs-6 px-4 py-1 me-2 active" onclick="auth.pages.auth.changeType(this, event)" data-type="mobile">{{ trans('authio::base.page.auth.mobile') }}</button>
+                            <button class="form-auth-change-data btn btn-color-gray-600 btn-active btn-active-secondary fs-6 px-4 py-1" onclick="auth.pages.auth.changeType(this, event)" data-type="email">{{ trans('authio::base.page.auth.email') }}</button>
                         </div>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                     <div id="form-auth-mobile" class="form-auth-data-mode active">
                         <div class="row">
                             <div class="col-8">
-                                <input type="number" id="mobile" autocomplete="off" class="form-control form-control-solid me-3 flex-grow-1" min="0" placeholder="{{ trans('authio::base.page.auth.mobile_placeholder') }}" onkeydown="authio.pages.auth.enterKey(event)"/>
+                                <input type="number" id="mobile" autocomplete="off" class="form-control form-control-solid me-3 flex-grow-1" min="0" placeholder="{{ trans('authio::base.page.auth.mobile_placeholder') }}" onkeydown="auth.pages.auth.enterKey(event)"/>
                             </div>
                             <div class="col-4">
                                 <select id="mobile-prefix" class="form-control form-control-solid btn-light fw-bold flex-shrink-0">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div id="form-auth-email" class="form-auth-data-mode">
-                        <input type="email" id="email" autocomplete="off" class="form-control form-control-solid" placeholder="{{ trans('authio::base.page.auth.email_placeholder') }}" onkeydown="authio.pages.auth.enterKey(event)"/>
+                        <input type="email" id="email" autocomplete="off" class="form-control form-control-solid" placeholder="{{ trans('authio::base.page.auth.email_placeholder') }}" onkeydown="auth.pages.auth.enterKey(event)"/>
                         <span class="text-danger fs-7 form-error" id="error-email"></span>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
             <div class="row mb-10">
                 <div class="col-12">
                     <div class="d-grid">
-                        <button class="btn btn-primary" onclick="authio.pages.auth.send(event)">
+                        <button class="btn btn-primary" onclick="auth.pages.auth.send(event)">
                             <span class="indicator-label">{{ trans('authio::base.page.buttons.next') }}</span>
                         </button>
                     </div>
@@ -82,7 +82,7 @@
                         <span>{{ trans('authio::base.page.code.description') }}</span>
                     </div>
                 </div>
-                <a href="javascript:void(0)" onclick="authio.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
+                <a href="javascript:void(0)" onclick="auth.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
                     <i class="ki-duotone ki-pencil fs-2x">
                         <span class="path1"></span>
                         <span class="path2"></span>
@@ -91,28 +91,28 @@
             </div>
             <div class="row fv-row mb-8 flex-row-reverse">
                 <div class="col">
-                    <input type="number" id="code-1" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="authio.pages.code.fill(this, event)" data-code-number="1"/>
+                    <input type="number" id="code-1" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="auth.pages.code.fill(this, event)" data-code-number="1"/>
                 </div>
                 <div class="col">
-                    <input type="number" id="code-2" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="authio.pages.code.fill(this, event)" data-code-number="2"/>
+                    <input type="number" id="code-2" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="auth.pages.code.fill(this, event)" data-code-number="2"/>
                 </div>
                 <div class="col">
-                    <input type="number" id="code-3" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="authio.pages.code.fill(this, event)" data-code-number="3"/>
+                    <input type="number" id="code-3" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="auth.pages.code.fill(this, event)" data-code-number="3"/>
                 </div>
                 <div class="col">
-                    <input type="number" id="code-4" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="authio.pages.code.fill(this, event)" data-code-number="4"/>
+                    <input type="number" id="code-4" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="auth.pages.code.fill(this, event)" data-code-number="4"/>
                 </div>
                 <div class="col">
-                    <input type="number" id="code-5" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="authio.pages.code.fill(this, event)" data-code-number="5"/>
+                    <input type="number" id="code-5" autocomplete="off" class="form-control form-control-solid text-center" onkeydown="auth.pages.code.fill(this, event)" data-code-number="5"/>
                 </div>
             </div>
             <div class="d-flex justify-content-between mb-7">
                 <div>
-                    <a href="javascript:void(0)" class="text-primary fw-semibold fs-6" onclick="authio.pages.password.show()">{{ trans('authio::base.page.buttons.login_password') }}</a>
+                    <a href="javascript:void(0)" class="text-primary fw-semibold fs-6" onclick="auth.pages.password.show()">{{ trans('authio::base.page.buttons.login_password') }}</a>
                 </div>
                 <div>
                     <span id="timer" class="text-primary fw-semibold fs-6 active"></span>
-                    <a href="javascript:void(0)" onclick="authio.pages.code.resend()">{{ trans('authio::base.page.buttons.resend') }}</a>
+                    <a href="javascript:void(0)" onclick="auth.pages.code.resend()">{{ trans('authio::base.page.buttons.resend') }}</a>
                 </div>
             </div>
             <div class="row mb-10">
@@ -140,7 +140,7 @@
                         <span>{{ trans('authio::base.page.password.description') }}</span>
                     </div>
                 </div>
-                <a href="javascript:void(0)" onclick="authio.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
+                <a href="javascript:void(0)" onclick="auth.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
                     <i class="ki-duotone ki-pencil fs-2x">
                         <span class="path1"></span>
                         <span class="path2"></span>
@@ -149,8 +149,8 @@
             </div>
             <div class="row fv-row mb-8 flex-row-reverse">
                 <div class="col position-relative">
-                    <input type="password" id="password" onkeyup="authio.pages.password.changeType.toggle(this)" autocomplete="off" class="form-control form-control-solid text-center"/>
-                    <div onclick="authio.pages.password.changeType.action(this)">
+                    <input type="password" id="password" onkeyup="auth.pages.password.changeType.toggle(this)" onkeydown="auth.pages.password.enterKey(event)" autocomplete="off" class="form-control form-control-solid text-center"/>
+                    <div onclick="auth.pages.password.changeType.action(this)">
                         <i class="ki-duotone ki-eye fs-1">
                             <span class="path1"></span>
                             <span class="path2"></span>
@@ -161,13 +161,13 @@
             </div>
             <div class="d-flex justify-content-between mb-7">
                 <div>
-                    <a href="javascript:void(0)" class="text-primary fw-semibold fs-6" onclick="authio.pages.code.show()">{{ trans('authio::base.page.buttons.login_code') }}</a>
+                    <a href="javascript:void(0)" class="text-primary fw-semibold fs-6" onclick="auth.pages.code.show()">{{ trans('authio::base.page.buttons.login_code') }}</a>
                 </div>
             </div>
             <div class="row mb-10">
                 <div class="col-12">
                     <div class="d-grid">
-                        <button class="btn btn-primary" onclick="authio.pages.password.send(event)">
+                        <button class="btn btn-primary" onclick="auth.pages.password.send(event)">
                             <span class="indicator-label">{{ trans('authio::base.page.buttons.login') }}</span>
                         </button>
                     </div>
@@ -183,7 +183,7 @@
                         <span>{{ trans('authio::base.page.authenticator.description') }}</span>
                     </div>
                 </div>
-                <a href="javascript:void(0)" onclick="authio.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
+                <a href="javascript:void(0)" onclick="auth.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
                     <i class="ki-duotone ki-pencil fs-2x">
                         <span class="path1"></span>
                         <span class="path2"></span>
@@ -197,7 +197,7 @@
             </div>
             <div class="d-flex justify-content-between mb-7">
                 <div>
-                    <a href="javascript:void(0)" class="text-primary fw-semibold fs-6" onclick="authio.pages.code.show()">{{ trans('authio::base.page.buttons.login_code') }}</a>
+                    <a href="javascript:void(0)" class="text-primary fw-semibold fs-6" onclick="auth.pages.code.show()">{{ trans('authio::base.page.buttons.login_code') }}</a>
                 </div>
             </div>
             <div class="row mb-10">
@@ -219,7 +219,7 @@
                         <span>{{ trans('authio::base.page.selection.description') }}</span>
                     </div>
                 </div>
-                <a href="javascript:void(0)" onclick="authio.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
+                <a href="javascript:void(0)" onclick="auth.pages.auth.backTo(event)" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="{{ trans('authio::base.page.buttons.change') }}">
                     <i class="ki-duotone ki-pencil fs-2x">
                         <span class="path1"></span>
                         <span class="path2"></span>
@@ -229,7 +229,7 @@
             <div class="row fv-row mb-8">
                 <div class="col">
                     <input type="radio" class="btn-check" name="selection-method" value="authenticator" id="select-authenticator"/>
-                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-5 d-flex align-items-center mb-5" for="select-authenticator" onclick="authio.pages.selection.select('authenticator')">
+                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-5 d-flex align-items-center mb-5" for="select-authenticator" onclick="auth.pages.selection.select('authenticator')">
                         <div class="col-3">
                             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 2481.9 2481.9" width="30px">
                                 <g transform="translate(-27 -27)">
@@ -259,7 +259,7 @@
                         </div>
                     </label>
                     <input type="radio" class="btn-check" name="selection-method" value="sms" id="select-sms"/>
-                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-5 d-flex align-items-center mb-5" for="select-sms" onclick="authio.pages.selection.select('code')">
+                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-5 d-flex align-items-center mb-5" for="select-sms" onclick="auth.pages.selection.select('code')">
                         <div class="col-3">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="100 85 315 315" width="30px" fill="#000">
                                 <path fill="#FFD05B" d="M408.2,360.4V189.5H96.8v170.9c0,20.2,16.3,36.5,36.5,36.5h238.4 C391.9,396.9,408.2,380.6,408.2,360.4z"/>
@@ -280,7 +280,7 @@
                         </div>
                     </label>
                     <input type="radio" class="btn-check" name="selection-method" value="email" id="select-email"/>
-                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-5 d-flex align-items-center mb-5" for="select-email" onclick="authio.pages.selection.select('email')">
+                    <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-5 d-flex align-items-center mb-5" for="select-email" onclick="auth.pages.selection.select('email')">
                         <div class="col-3">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30px" fill="#000000">
                                 <polygon fill="#C0874A" points="511.401,173.663 502.513,179.269 458.244,207.066 268.606,326.073 266.213,327.652 265.699,327.968 256.043,334.048 255.701,334.207 247.753,329.232 246.299,328.284 66.659,215.516 54.439,207.856 0.598,174.057 0,173.663 54.439,139.469 249.548,16.988 261.854,16.988 458.244,140.258 464.74,144.365"/>

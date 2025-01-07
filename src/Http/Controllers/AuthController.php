@@ -76,7 +76,7 @@ class AuthController extends Controller
         if (file_exists(public_path('templates/' . $template . '/assets/js/page/auth.js'))) {
             DomiScript('templates/' . $template . '/assets/js/page/auth.js');
         } else {
-            DomiPlugins('jquery.form');
+            DomiScript('assets/vendor/authio/js/authio.js');
             DomiScript('assets/vendor/authio/js/auth.js');
         }
 

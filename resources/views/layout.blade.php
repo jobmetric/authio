@@ -41,8 +41,8 @@
                         <div class="d-flex flex-stack px-lg-5">
                             <div class="me-0">
                                 <button class="btn btn-flex btn-link btn-color-gray-700 btn-active-color-primary rotate fs-base" data-kt-menu-trigger="click" data-kt-menu-placement="top-end" data-kt-menu-offset="0px, 0px">
-                                    <img data-kt-element="current-lang-flag" class="w-20px h-20px rounded me-3" src="{{ asset('assets/vendor/language/flags/' . $languageInfo->flag) }}" alt="{{ $languageInfo->name }}" />
-                                    <span data-kt-element="current-lang-name" class="me-1">{{ $languageInfo->name }}</span>
+                                    <img data-kt-element="current-lang-flag" class="w-20px h-20px rounded me-3" src="{{ asset('assets/vendor/language/flags/' . $languageInfo?->flag) }}" alt="{{ $languageInfo?->name }}" />
+                                    <span data-kt-element="current-lang-name" class="me-1">{{ $languageInfo?->name }}</span>
                                     <i class="ki-outline ki-down fs-5 text-muted rotate-180 m-0"></i>
                                 </button>
                                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-4 fs-7" data-kt-menu="true" id="kt_auth_lang_menu">
