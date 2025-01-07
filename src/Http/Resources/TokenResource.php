@@ -2,6 +2,7 @@
 
 namespace JobMetric\Authio\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,7 +20,7 @@ class TokenResource extends JsonResource
             'token' => [
                 'access_token' => $this['token'],
                 'token_type' => 'bearer',
-                'expires_in' => config('jwt.ttl') * 60,
+                'expires_in' => Carbon::now()->addMinutes(config('jwt.ttl'))->timestamp,
             ],
             'user' => UserResource::make($this['user']),
         ];
